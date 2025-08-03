@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calcutta High Court - Case Search</title>
+  <link rel="stylesheet" href="/static/style.css" />
+  <style>
+    .page-title {
+      text-align: center;
+      color: #2c3e50;
+      margin-bottom: 30px;
+      font-size: 2em;
+    }
+
+    .court-title {
+      text-align: center;
+      color: #34495e;
+      margin-bottom: 20px;
+      font-size: 1.5em;
+    }
+
+    #loading-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.9);
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid #f3f3f3;
+      border-radius: 50%;
+      border-top: 5px solid #3498db;
+      animation: spin 1s linear infinite;
+    }
+
+    .loading-text {
+      margin-top: 20px;
+      font-size: 1.2em;
+      color: #2c3e50;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="loading-overlay">
+    <div class="spinner"></div>
+    <div class="loading-text">Fetching case details, please wait...</div>
+  </div>
+
+  <div class="container">
+    <h1 class="page-title">Calcutta High Court</h1>
+    <h2 class="court-title">Case Information System</h2>
+    <form method="post" action="/search" id="searchForm">
+      <label for="casetype">Case Type</label>
+      <select name="case_type" id="casetype">
+        <option value="Select Case Type">Select Case Type</option>
+        <option value="AA - ARBRITATION APPL.(1)">AA - ARBRITATION APPL.(1)
+        </option>
+        <option value="ABWA - APPL.UND.BENGAL WAKFS ACT(2)">ABWA - APPL.UND.BENGAL
+          WAKFS ACT(2)
+        </option>
+        <option value="AC - AWARD CASES(3)">AC - AWARD CASES(3)</option>
+        <option value="ACA - APPL.UNDER CHARTERED ACCOUNTANTS ACT, 1949(4)">
+          ACA - APPL.UNDER CHARTERED ACCOUNTANTS ACT, 1949(4)
+        </option>
+        <option value="ACO - PET. IN COMP. APPL.(5)">ACO - PET. IN COMP. APPL.(5)
+        </option>
+        <option value="ACR - APPL.UND.CHARITABLE AND RELIGIOUS TRUST ACT(6)">
+          ACR - APPL.UND.CHARITABLE AND RELIGIOUS TRUST ACT(6)
+        </option>
+        <option value="ACRP - APPL.UND.SEC.151 OF THE CR.P.C.(7)">ACRP - APPL.UND.SEC.151
+          OF THE CR.P.C.(7)
+        </option>
+        <option value="ACWA - APPL.UND.SEC 21 COST AND WORKS ACCOUNTACTS ACT, 1959(8)">
+          ACWA - APPL.UND.SEC 21 COST AND WORKS ACCOUNTACTS ACT, 1959(8)
+        </option>
+        <option value="AD-COM - APPEAL FROM DECREES (COMMERCIAL)(134)">AD-COM - APPEAL
+          FROM DECREES (COMMERCIAL)(134)
+        </option>
+        <option value="AED - APPL. U/S. 64 OF ESTATE DUTY ACT, 1953(9)">AED - APPL. U/S.
+          64 OF ESTATE DUTY ACT, 1953(9)
+        </option>
+        <option value="AET - APPL. U/S 25 OF EXPENDITURE TAX ACT, 1957(10)">AET - APPL.
+          U/S 25 OF EXPENDITURE TAX ACT, 1957(10)
+        </option>
+        <option value="AFP - APPL.FOR LEAVE TO SUE AS AN INDIGENT PERSON(11)">AFP - APPL.FOR
+          LEAVE TO SUE AS AN INDIGENT PERSON(11)
+        </option>
+        <option value="AGA - APPL.UND.SEC.25 OF ADMINISTRATOR GENERALS ACT(12)">AGA - APPL.UND.SEC.25
+          OF ADMINISTRATOR GENERALS ACT(12)
+        </option>
+        <option value="AGL - APPL.FOR APPOINTMENT OF GUARDIAN-AD-LITEM(13)">AGL - APPL.FOR
+          APPOINTMENT OF GUARDIAN-AD-LITEM(13)
+        </option>
+        <option value="AGT - APPL. U/S 26 GIFT TAX ACT, 1958(14)">AGT - APPL. U/S 26 GIFT
+          TAX ACT, 1958(14)
+        </option>
+        <option value="AGWA - APPL.UND.GUARDIANS AND WARDS ACT(15)">AGWA - APPL.UND.GUARDIANS
+          AND WARDS ACT(15)
+        </option>
+        <option value="AHC - HABEAS CORPUS(16)">AHC - HABEAS CORPUS(16)</option>
+        <option value="AID - APPL. UNDER PATENTS AND DESIGNS ACT, 1970(17)">AID - APPL.
+          UNDER PATENTS AND DESIGNS ACT, 1970(17)
+        </option>
+        <option value="AIDR - APPL.UND.INDUSTRIAL DEVELOPMENT REGULATION ACT(18)">AIDR -
+          APPL.UND.INDUSTRIAL DEVELOPMENT REGULATION ACT(18)
+        </option>
+        <option value="AIFC - APPL.UND.INDUSTRIAL FINANCE CORP. ACT(19)">AIFC - APPL.UND.INDUSTRIAL
+          FINANCE CORP. ACT(19)
+        </option>
+        <option value="AIRB - APPN.RECON.BANK OF I(20)">AIRB - APPN.RECON.BANK OF I(20)
+        </option>
+        <option value="ALP - APPL.UND.CLAUSE 13 OF LETTERS PATENT(21)">ALP - APPL.UND.CLAUSE
+          13 OF LETTERS PATENT(21)
+        </option>
+        <option value="ALPII - APPL.UND.CLAUSE 17 L(23)">ALPII - APPL.UND.CLAUSE 17 L(23)
+        </option>
+        <option value="ALP-IPD - INTELLECTUAL PROPERTY SUBJECT MATTER APPLICATIONS UNDER
+            CLAUSE 13 OF LETTER PATENT(138)">
+          ALP-IPD - INTELLECTUAL PROPERTY SUBJECT MATTER APPLICATIONS UNDER
+          CLAUSE 13 OF LETTER PATENT(138)
+        </option>
+        <option value="ALPITL - APPL.CLAUSE-17 LP(24)">ALPITL - APPL.CLAUSE-17 LP(24)
+        </option>
+        <option value="ALP.ITL - APPL. UNDER CLAUSE 17 OF THE LETTERS PATENT(22)">ALP.ITL
+          - APPL. UNDER CLAUSE 17 OF THE LETTERS PATENT(22)
+        </option>
+        <option value="AO-COM - APPEAL FROM ORDERS (COMMERCIAL)(119)">AO-COM - APPEAL FROM
+          ORDERS (COMMERCIAL)(119)
+        </option>
+        <option value="AOR - CALCUTTA OFFICIAL RECEIVER&amp;amp;">AOR - CALCUTTA OFFICIAL
+          RECEIVER&amp;amp;
+        </option>
+        <option value="AORC - APPLICATION OMNIBUS RESIDUARY CLASS(26)">AORC - APPLICATION
+          OMNIBUS RESIDUARY CLASS(26)
+        </option>
+        <option value="AOT - APPL.UND.OFFICIAL TRUSTEES ACT(27)">AOT - APPL.UND.OFFICIAL
+          TRUSTEES ACT(27)
+        </option>
+        <option value="AP - ARBITRATION PETITION(28)">AP - ARBITRATION PETITION(28)</option>
+        <option value="AP-COM - ARBITRATION PETITION (COMMERCIAL)(118)">AP-COM - ARBITRATION
+          PETITION (COMMERCIAL)(118)
+        </option>
+        <option value="APD - APPEAL FROM DECREE(29)">APD - APPEAL FROM DECREE(29)</option>
+        <option value="APDT - APP. FR. DECR. TEND.(30)">APDT - APP. FR. DECR. TEND.(30)
+        </option>
+        <option value="APML - APPEAL UNDER PREVENTION OF MONEY LAUNDERING(100)">APML -
+          APPEAL UNDER PREVENTION OF MONEY LAUNDERING(100)
+        </option>
+        <option value="APMLT - TENDER FOR APPEAL UNDER PREVENTION OF MONEY LAUNDERING(101)">
+          APMLT - TENDER FOR APPEAL UNDER PREVENTION OF MONEY LAUNDERING(101)
+        </option>
+        <option value="APO - APPEAL FROM ORDER(31)">APO - APPEAL FROM ORDER(31)</option>
+        <option value="APO-IPD - APPEAL FROM ORDER ARISING FROM AN INTELLECTUAL PROPERTY
+            SUBJECT MATTER PROCEEDING(139)">
+          APO-IPD - APPEAL FROM ORDER ARISING FROM AN INTELLECTUAL PROPERTY
+          SUBJECT MATTER PROCEEDING(139)
+        </option>
+        <option value="APOT - TEMP APO(32)">APOT - TEMP APO(32)</option>
+        <option value="AS - ADMIRALITY SUITS(33)">AS - ADMIRALITY SUITS(33)</option>
+        <option value="ASCI - APPL.FOR LEAVE TO APPEAL TO THE SUPREME COURT OF INDIA(34)">
+          ASCI - APPL.FOR LEAVE TO APPEAL TO THE SUPREME COURT OF INDIA(34)
+        </option>
+        <option value="AS-COM - ADMIRALTY SUITS (COMMERCIAL)(120)">AS-COM - ADMIRALTY
+          SUITS (COMMERCIAL)(120)
+        </option>
+        <option value="ASFC - APPL.UND.STAE FINANCIAL CORP. ACT(35)">ASFC - APPL.UND.STAE
+          FINANCIAL CORP. ACT(35)
+        </option>
+        <option value="ASM - APPL.SANCHAITA MATTERS(36)">ASM - APPL.SANCHAITA MATTERS(36)
+        </option>
+        <option value="ATA - APPL.UNDER TRUST ACT(37)">ATA - APPL.UNDER TRUST ACT(37)
+        </option>
+        <option value="ATM - APPL.UND.TRADE AND MERCHANDISE MARKS, ACT(38)">ATM - APPL.UND.TRADE
+          AND MERCHANDISE MARKS, ACT(38)
+        </option>
+        <option value="AUDA - APPL.UND.UNCLAIMED DEPOSITS ACT(39)">AUDA - APPL.UND.UNCLAIMED
+          DEPOSITS ACT(39)
+        </option>
+        <option value="AWT - APPL. U/S 27 OF WEALTH TAX ACT, 1957(40)">AWT - APPL. U/S 27
+          OF WEALTH TAX ACT, 1957(40)
+        </option>
+        <option value="BBA - APPL.UND.BANKERS BOOKS EVIDENCE ACT, 1891(41)">BBA - APPL.UND.BANKERS
+          BOOKS EVIDENCE ACT, 1891(41)
+        </option>
+        <option value="BIFR(42)">BIFR(42)</option>
+        <option value="CA - COMPANY APPLICATION(43)">CA - COMPANY APPLICATION(43)</option>
+        <option value="CAA - COMMISSIONER OF PATENT APPEAL(44)">CAA - COMMISSIONER OF PATENT
+          APPEAL(44)
+        </option>
+        <option value="CC - CONTEMPT OF COURT CASES(45)">CC - CONTEMPT OF COURT CASES(45)
+        </option>
+        <option value="CC-COM - CONTEMPT CASE (COMMERCIAL)(124)">CC-COM - CONTEMPT CASE
+          (COMMERCIAL)(124)
+        </option>
+        <option value="CC-IPD - INTELLECTUAL PROPERTY SUBJECT MATTER CONTEMPT
+            PETITIONS(137)">
+          CC-IPD - INTELLECTUAL PROPERTY SUBJECT MATTER CONTEMPT
+          PETITIONS(137)
+        </option>
+        <option value="CEXA - APPL.UND.CENTRAL EXCISE ACT(46)">CEXA - APPL.UND.CENTRAL
+          EXCISE ACT(46)
+        </option>
+        <option value="CHS - CHAMBER SUMMONS(47)">CHS - CHAMBER SUMMONS(47)</option>
+        <option value="CP - COMPANY PETITIONS(48)">CP - COMPANY PETITIONS(48)</option>
+        <option value="CPA - COMMISSIONER OF PATE(49)">CPA - COMMISSIONER OF PATE(49)
+        </option>
+        <option value="CRA - COPYRIGHT APPEAL(50)">CRA - COPYRIGHT APPEAL(50)</option>
+        <option value="CRCC - CRIMINAL CONTEMPT(51)">CRCC - CRIMINAL CONTEMPT(51)</option>
+        <option value="CS - CIVIL SUITS(52)">CS - CIVIL SUITS(52)</option>
+        <option value="CS-COM - CIVIL SUIT (COMMERCIAL)(117)">CS-COM - CIVIL SUIT
+          (COMMERCIAL)(117)
+        </option>
+        <option value="CS(O) - CIVIL SUIT(OLD)(53)">CS(O) - CIVIL SUIT(OLD)(53)</option>
+        <option value="CSOS - CIVIL SUIT ORIGINATING SUMMONS(54)">CSOS - CIVIL SUIT ORIGINATING
+          SUMMONS(54)
+        </option>
+        <option value="CUSTA - APPL.UND.CUSTOMS ACT(55)">CUSTA - APPL.UND.CUSTOMS ACT(55)
+        </option>
+        <option value="DM - UND.CHAPTER V OF O.S. RULES(56)">DM - UND.CHAPTER V OF O.S.
+          RULES(56)
+        </option>
+        <option value="EC - EXECUTION CASES(57)">EC - EXECUTION CASES(57)</option>
+        <option value="EC-COM - EXECUTION CASE (COMMERCIAL)(122)">EC-COM - EXECUTION CASE
+          (COMMERCIAL)(122)
+        </option>
+        <option value="EOPLA - EXTRA ORDINARY PROBATE PROCEEDINGS(58)">EOPLA - EXTRA ORDINARY
+          PROBATE PROCEEDINGS(58)
+        </option>
+        <option value="EOS - EXTRA ORDINARY SUITS(59)">EOS - EXTRA ORDINARY SUITS(59)
+        </option>
+        <option value="EP - ELEC.PET.(PEOPLES REPRESENTATION ACT, 1951)(60)">EP - ELEC.PET.(PEOPLES
+          REPRESENTATION ACT, 1951)(60)
+        </option>
+        <option value="FEA - FOREIGN EXCHANGE APPEAL(61)">FEA - FOREIGN EXCHANGE APPEAL(61)
+        </option>
+        <option value="FERA - APPL.UND.FOREIGN EXCHANGE REGULATION ACT(62)">FERA - APPL.UND.FOREIGN
+          EXCHANGE REGULATION ACT(62)
+        </option>
+        <option value="GA-COM - GENERAL APPLICATION (COMMERCIAL)(123)">GA-COM - GENERAL
+          APPLICATION (COMMERCIAL)(123)
+        </option>
+        <option value="GCAL - APPL.UND.GOLD CONTROL ACT(63)">GCAL - APPL.UND.GOLD CONTROL
+          ACT(63)
+        </option>
+        <option value="IC - INSOLVENCY CASES(64)">IC - INSOLVENCY CASES(64)</option>
+        <option value="ICA - APPL.UNDER INDIAN COMPANIES ACT, 1913(65)">ICA - APPL.UNDER
+          INDIAN COMPANIES ACT, 1913(65)
+        </option>
+        <option value="IP - IT.PET.256(2)IT&amp;amp;">IP - IT.PET.256(2)IT&amp;amp;</option>
+        <option value="IP-COM - INTELLECTUAL PROPERTY MATTERS (COMMERCIAL)(121)">IP-COM -
+          INTELLECTUAL PROPERTY MATTERS (COMMERCIAL)(121)
+        </option>
+        <option value="IPDAID - APPEALS UNDER THE DESIGNS ACT, 2000(110)">IPDAID - APPEALS
+          UNDER THE DESIGNS ACT, 2000(110)
+        </option>
+        <option value="IPDATM - APPLICATIONS UNDER SECTION 47, 57, 125 OF TRADE MARKS ACT,
+            1999(112)">
+          IPDATM - APPLICATIONS UNDER SECTION 47, 57, 125 OF TRADE MARKS ACT,
+          1999(112)
+        </option>
+        <option value="IPDCR - APPLICATIONS UNDER SCETION 50 OF THE COPYRIGHT ACT,
+            1957(113)">
+          IPDCR - APPLICATIONS UNDER SCETION 50 OF THE COPYRIGHT ACT,
+          1957(113)
+        </option>
+        <option value="IPDCRA - APPEALS UNDER THE COPYRIGHT ACT, 1957(105)">IPDCRA - APPEALS
+          UNDER THE COPYRIGHT ACT, 1957(105)
+        </option>
+        <option value="IPDGI - APPL. U/S 27/58 OF THE GEOGRAPHICAL INDICATIONS OF GOODS
+            (REG And PROT), ACT 1999(115)">
+          IPDGI - APPL. U/S 27/58 OF THE GEOGRAPHICAL INDICATIONS OF GOODS
+          (REG And PROT), ACT 1999(115)
+        </option>
+        <option value="IPDGIA - APPEALS UNDER THE GI OF GOODS (REGISTRATION AND PROTECTION)
+            ACT, 1999(107)">
+          IPDGIA - APPEALS UNDER THE GI OF GOODS (REGISTRATION AND PROTECTION)
+          ACT, 1999(107)
+        </option>
+        <option value="IPDIT - APPLICATIONS UNDER SECTION 46 (1A) OF THE INFORMATION
+            TECHNOLOGY ACT, 2000(116)">
+          IPDIT - APPLICATIONS UNDER SECTION 46 (1A) OF THE INFORMATION
+          TECHNOLOGY ACT, 2000(116)
+        </option>
+        <option value="IPDITA - APPEALS UNDER THE INFORMATION TECHNOLOGY ACT, 2000(111)">
+          IPDITA - APPEALS UNDER THE INFORMATION TECHNOLOGY ACT, 2000(111)
+        </option>
+        <option value="IPDPAT - APPLICATIONS UNDER SECTION 58/64/71/103 OF THE PATENTS ACT,
+            1970(114)">
+          IPDPAT - APPLICATIONS UNDER SECTION 58/64/71/103 OF THE PATENTS ACT,
+          1970(114)
+        </option>
+        <option value="IPDPTA - APPEALS UNDER PATENTS ACT, 1970(106)">IPDPTA - APPEALS UNDER
+          PATENTS ACT, 1970(106)
+        </option>
+        <option value="IPDPVA - APPEALS UNDER THE PLANT VARIETIES AND FARMERS RIGHT ACT,
+            2001(108)">
+          IPDPVA - APPEALS UNDER THE PLANT VARIETIES AND FARMERS RIGHT ACT,
+          2001(108)
+        </option>
+        <option value="IPDSCD - APPEALS UNDER THE SEMICONDUCTOR INTEGRATED CIRCUITS
+            LAYOUT-DESIGN ACT, 2000(109)">
+          IPDSCD - APPEALS UNDER THE SEMICONDUCTOR INTEGRATED CIRCUITS
+          LAYOUT-DESIGN ACT, 2000(109)
+        </option>
+        <option value="IPD/SCDA - PETITION/APPLICATION UNDER SECTION 40/SECTION 41 OF THE
+            SEMICONDUCTOR INTEGRATED CIRCUITS(135)">
+          IPD/SCDA - PETITION/APPLICATION UNDER SECTION 40/SECTION 41 OF THE
+          SEMICONDUCTOR INTEGRATED CIRCUITS(135)
+        </option>
+        <option value="IPDTMA - APPEALS UNDER THE TRADE MARKS ACT, 1999(104)">IPDTMA -
+          APPEALS UNDER THE TRADE MARKS ACT, 1999(104)
+        </option>
+        <option value="ITA - INCOME TAX APPEAL(67)">ITA - INCOME TAX APPEAL(67)</option>
+        <option value="ITAT - INCOME TAX APPEAL TENDERED(68)">ITAT - INCOME TAX APPEAL
+          TENDERED(68)
+        </option>
+        <option value="ITP - INCOME TAX PET.(U/S. 256 (2) OF I.T. ACT, 1961)(69)">ITP -
+          INCOME TAX PET.(U/S. 256 (2) OF I.T. ACT, 1961)(69)
+        </option>
+        <option value="ITR - INCOMETAX REF.SEC.256 (1) OF I.T. ACT, 1961(70)">ITR - INCOMETAX
+          REF.SEC.256 (1) OF I.T. ACT, 1961(70)
+        </option>
+        <option value="LM - LUNATIC MATTERS(71)">LM - LUNATIC MATTERS(71)</option>
+        <option value="LPA - LETTERS PATENT APPEAL(72)">LPA - LETTERS PATENT APPEAL(72)
+        </option>
+        <option value="LPA-IPD - LETTERS PATENT APPEAL FROM AN INTELLECTUAL PROPERTY
+            SUBJECT MATTER PROCEEDING(142)">
+          LPA-IPD - LETTERS PATENT APPEAL FROM AN INTELLECTUAL PROPERTY
+          SUBJECT MATTER PROCEEDING(142)
+        </option>
+        <option value="MISC. ARB - COM - MISCELLANEOUS ARBITRATION (COMMERCIAL)(128)">
+          MISC. ARB - COM - MISCELLANEOUS ARBITRATION (COMMERCIAL)(128)
+        </option>
+        <option value="MM - MISFEAOUCE MATTERS(73)">MM - MISFEAOUCE MATTERS(73)</option>
+        <option value="MS - MATRIMONIAL SUITS(74)">MS - MATRIMONIAL SUITS(74)</option>
+        <option value="NM - NOTICE OF MOTION(75)">NM - NOTICE OF MOTION(75)</option>
+        <option value="OCO - ORIGINAL SIDE CROSS OBJECTION(76)">OCO - ORIGINAL SIDE CROSS
+          OBJECTION(76)
+        </option>
+        <option value="OCOT - ORIGINAL SIDE CROSS OBJECTION TENDER(77)">OCOT - ORIGINAL
+          SIDE CROSS OBJECTION TENDER(77)
+        </option>
+        <option value="OTS - ORDINANCE TRANSFER SUITS(78)">OTS - ORDINANCE TRANSFER SUITS(78)
+        </option>
+        <option value="PLA - APPL.FOR PROBATE AND LETTERS OF ADMINISTRATION(79)">PLA -
+          APPL.FOR PROBATE AND LETTERS OF ADMINISTRATION(79)
+        </option>
+        <option value="PLR - UND.CHPT.XXXI-A OF O.S. RULES(80)">PLR - UND.CHPT.XXXI-A OF
+          O.S. RULES(80)
+        </option>
+        <option value="PMS - PARSI MATRIMONIAL SUITS(81)">PMS - PARSI MATRIMONIAL SUITS(81)
+        </option>
+        <option value="REF - REFERENCE CASE(82)">REF - REFERENCE CASE(82)</option>
+        <option value="RVW-IPD - REVIEW ARISING FROM AN INTELLECTUAL PROPERTY SUBJECT
+            MATTER PROCEEDING(141)">
+          RVW-IPD - REVIEW ARISING FROM AN INTELLECTUAL PROPERTY SUBJECT
+          MATTER PROCEEDING(141)
+        </option>
+        <option value="RVWO - MEMORANDUM OF REVIEWS(83)">RVWO - MEMORANDUM OF REVIEWS(83)
+        </option>
+        <option value="SALT - APPL.UND.SALT ACT(84)">SALT - APPL.UND.SALT ACT(84)</option>
+        <option value="SANA - SANCHAITA APPEAL(85)">SANA - SANCHAITA APPEAL(85)</option>
+        <option value="SCO - SPECIAL CASE FOR OPINION OF COURT(86)">SCO - SPECIAL CASE FOR
+          OPINION OF COURT(86)
+        </option>
+        <option value="SESS - SESSIONS CASES(87)">SESS - SESSIONS CASES(87)</option>
+        <option value="SS - SPECIAL SUITS(SEC 20 OF THE ARBITRATION ACT, 1940(88)">SS -
+          SPECIAL SUITS(SEC 20 OF THE ARBITRATION ACT, 1940(88)
+        </option>
+        <option value="T - TEMP A(1)(89)">T - TEMP A(1)(89)</option>
+        <option value="TBCS - TRANSFERRED BANKING COMPANIES SUITS(90)">TBCS - TRANSFERRED
+          BANKING COMPANIES SUITS(90)
+        </option>
+        <option value="TCS - TRANSFERRED COMPANY SUITS(91)">TCS - TRANSFERRED COMPANY SUITS(91)
+        </option>
+        <option value="TEMPAPO-IPD - APPEAL FROM ORDER TEMP FROM AN INTELLECTUAL PROPERTY
+            SUBJECT MATTER PROCEEDING(140)">
+          TEMPAPO-IPD - APPEAL FROM ORDER TEMP FROM AN INTELLECTUAL PROPERTY
+          SUBJECT MATTER PROCEEDING(140)
+        </option>
+        <option value="TMA - TRADE MARK APPEAL(92)">TMA - TRADE MARK APPEAL(92)</option>
+        <option value="TS - TESTAMENTERY SUITS(93)">TS - TESTAMENTERY SUITS(93)</option>
+        <option value="TUA - TRADE UNION APPEAL(94)">TUA - TRADE UNION APPEAL(94)</option>
+        <option value="WPCR - WRIT PETITION(CIVIL RULE)(99)">WPCR - WRIT PETITION(CIVIL
+          RULE)(99)
+        </option>
+        <option value="WP.CT - WP(CENTRAL ADMIN TRIBUNAL)(96)">WP.CT - WP(CENTRAL ADMIN
+          TRIBUNAL)(96)
+        </option>
+        <option value="WPO - WRIT PETITION(95)">WPO - WRIT PETITION(95)</option>
+        <option value="WPO(H) - WRIT (HABEAS CORPUS)(103)">WPO(H) - WRIT (HABEAS CORPUS)(103)
+        </option>
+        <option value="WPO-IPD - INTELLECTUAL PROPERTY SUBJECT MATTER WRIT PETITIONS(136)">
+          WPO-IPD - INTELLECTUAL PROPERTY SUBJECT MATTER WRIT PETITIONS(136)
+        </option>
+        <option value="WPO(P) - WRIT (PIL MATTER)(102)">WPO(P) - WRIT (PIL MATTER)(102)
+        </option>
+        <option value="WP.ST - WP(STATE ADMIN TRIBUNAL)(97)">WP.ST - WP(STATE ADMIN TRIBUNAL)(97)
+        </option>
+        <option value="WP.TT - WP(WB TAX TRIBUNAL)(98)">WP.TT - WP(WB TAX TRIBUNAL)(98)
+        </option>
+      </select>
+
+      <label for="casenumber">Case Number</label>
+      <input type="text" id="casenumber" name="case_number" placeholder="Enter Case Number" />
+
+      <label for="year">Year</label>
+      <input type="text" id="year" name="year" placeholder="Enter Year" />
+
+
+      <button type="submit">Search Case</button>
+    </form>
+  </div>
+
+  <script>
+    document.getElementById('searchForm').addEventListener('submit', function () {
+      document.getElementById('loading-overlay').style.display = 'flex';
+    });
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Case Details</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <style>
+    .section {
+      margin: 20px 0;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+
+    .section h2 {
+      margin-bottom: 15px;
+      color: #333;
+      border-bottom: 2px solid #007bff;
+      padding-bottom: 5px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 10px;
+    }
+
+    th,
+    td {
+      padding: 10px;
+      border: 1px solid #ddd;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f5f5f5;
+      font-weight: bold;
+    }
+
+    .orders-table th {
+      background-color: #007bff;
+      color: white;
+    }
+
+    .party-box {
+      background-color: #f8f9fa;
+      padding: 15px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+    }
+
+    .acts-sections {
+      display: flex;
+      gap: 20px;
+    }
+
+    .acts-sections>div {
+      flex: 1;
+    }
+
+    .button {
+      display: inline-block;
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+      margin-top: 20px;
+    }
+
+    .button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>Case Details</h1>
+
+    <!-- Parties Section -->
+    <div class="section">
+      <h2>Parties</h2>
+      <div class="party-box">
+        <h3>Petitioner(s)</h3>
+        <ul>
+          {% for petitioner in result.petitioner_names %}
+          <li>{{ petitioner }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+      <div class="party-box">
+        <h3>Respondent(s)</h3>
+        <ul>
+          {% for respondent in result.respondent_names %}
+          <li>{{ respondent }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+
+    <!-- Case Details Section -->
+    <div class="section">
+      <h2>Case Information</h2>
+      <table>
+        <tr>
+          <th>Case Type</th>
+          <td>{{ result.case_type }}</td>
+          <th>CNR Number</th>
+          <td>{{ result.cnr_number }}</td>
+        </tr>
+        <tr>
+          <th>Filing Number</th>
+          <td>{{ result.filing_number }}</td>
+          <th>Filing Date</th>
+          <td>{{ result.filing_date }}</td>
+        </tr>
+        <tr>
+          <th>Registration Number</th>
+          <td>{{ result.registration_number }}</td>
+          <th>Registration Date</th>
+          <td>{{ result.registration_date }}</td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Case Status Section -->
+    <div class="section">
+      <h2>Case Status</h2>
+      <table>
+        <tr>
+          <th>Stage of Case</th>
+          <td>{{ result.case_stage }}</td>
+        </tr>
+        <tr>
+          <th>First Hearing Date</th>
+          <td>{{ result.first_hearing_date }}</td>
+        </tr>
+        <tr>
+          <th>Next Hearing Date</th>
+          <td>{{ result.next_hearing_date }}</td>
+        </tr>
+        <tr>
+          <th>Coram</th>
+          <td>{{ result.coram }}</td>
+        </tr>
+        <!-- <tr>
+          <th>State</th>
+          <td>{{ result.state }}</td>
+        </tr>
+        <tr>
+          <th>District</th>
+          <td>{{ result.distict }}</td>
+        </tr> -->
+      </table>
+    </div>
+
+    <!-- Acts and Sections -->
+    <div class="section">
+      <h2>Acts and Sections</h2>
+      <div class="acts-sections">
+        <div>
+          <h3>Acts</h3>
+          <ul>
+            {% for act in result.acts %}
+            <li>{{ act }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+        <div>
+          <h3>Sections</h3>
+          <ul>
+            {% for section in result.sections %}
+            <li>{{ section }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Orders Section -->
+    <div class="section">
+      <h2>Orders History</h2>
+      <table class="orders-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Judge(s)</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for i in range(result.order_dates|length) %}
+          <tr>
+            <td>{{ result.order_dates[i] }}</td>
+            <td>{{ result.judges[i] }}</td>
+            <td>
+              <a href="{{ result.order_links[i] }}" target="_blank" class="button">View Order</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <a href="/" class="button">Search Again</a>
+  </div>
+</body>
+
+</html>
