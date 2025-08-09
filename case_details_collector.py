@@ -70,6 +70,9 @@ async def get_case_details():
                     data["case_stage"] = lines[i+1].replace(':', '').strip()
                 elif "Case Status" in lines[i]:
                     data["case_stage"] = lines[i+1].replace(':', '').strip()
+                    # Making the first hearing and last hearing date as N/A for temparary perpose
+                    data["first_hearing_date"] = "N/A"
+                    data["next_hearing_date"] = "N/A"
                 elif "Coram" in lines[i]:
                     data["coram"] = lines[i+1].replace(':', '').strip()
                 elif "State" in lines[i]:
@@ -78,7 +81,7 @@ async def get_case_details():
                     data["distict"] = lines[i+1].replace(':', '').strip()
                 i += 1
 
-            print(data)
+            # print(data)
 
             # Getting parties Details
             petitioner = soup.find("span",class_="Petitioner_Advocate_table")
@@ -149,8 +152,6 @@ async def get_case_details():
             # For Storing details
             judges = []
             order_dates = []
-            order_pdf_link = []
-            website_prefix = "https://hcservices.ecourts.gov.in/ecourtindiaHC/cases/"
             # Getting all the order and thier order pdf
             for order in orders:
                 cols = order.find_all("td")
@@ -158,19 +159,31 @@ async def get_case_details():
                 # Extract Judge, Order Date, and Order Details
                 judge = cols[2].get_text(strip=True)
                 order_date = cols[3].get_text(strip=True)
-                order_link_tag = cols[4].find("a")
-                order_link = order_link_tag['href'] if order_link_tag else None
+                # order_link_tag = cols[4].find("a")
+                # order_link = order_link_tag['href'] if order_link_tag else None
 
                 judges.append(judge)
                 order_dates.append(order_date)
-                order_pdf_link.append(website_prefix+order_link)
+                # order_pdf_link.append(website_prefix)
+            
+            # Getting Stored PDF links
+            order_pdf_link = []
+            if os.path.exists("static/pdf"):
+                files = os.listdir("static/pdf")
+
+                # Making files sorted for orders 
+                files.sort(key=lambda x: int(x.replace("order_", "").replace(".pdf", "")))
+
+                for file in files:
+                    order_pdf_link.append("./static/pdf/"+file)
+
 
             # Adding orders details
             data["judges"] = judges
             data["order_dates"] = order_dates
             data["order_links"] = order_pdf_link
 
-            # print(data)
+            print(data["order_links"])
         return data
     except Exception as e:
         print(e)

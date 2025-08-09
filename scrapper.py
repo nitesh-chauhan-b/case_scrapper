@@ -9,7 +9,7 @@ import time
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from captch_reader import solve_captcha
-
+import requests
 import os
 import asyncio
 
@@ -20,6 +20,9 @@ def create_driver():
     options.add_argument("--headless=new") 
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
+    options.add_argument("--disable-gpu")
+    options.add_argument("--disable-software-rasterizer")
+
     
     # Initialize the Chrome driver
     driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)
@@ -52,54 +55,16 @@ async def submit_case_details(url, case_type, case_number, year):
         driver.find_element(By.ID, "search_case_no").send_keys(case_number)
         driver.find_element(By.ID, "rgyear").send_keys(year)
 
-        # Trying Multiple Times for captcha filling
-        # max_attempts = 4
-        # for attempt in range(max_attempts):
-        #     # GEtting the captcha Image and saving it and getting it's text
-        #     captcha_image = driver.find_element(By.ID, "captcha_image")
-        #     captcha_image.screenshot("static/captcha.jpg")
-
-        #     # Getting Captcha box to sent captch text
-
-        #     captcha_input_box = driver.find_element(By.ID,"captcha")
-        #     # Based on the saved image getting the captac text from the user
-
-        #     if os.path.exists("static/captcha.jpg"):
-        #         # Giving this image path to the captch_reader to get the image text
-        #         captcha_text = await solve_captcha("static/captcha.jpg")
-
-        #         captcha_input_box.clear()
-        #         captcha_input_box.send_keys(captcha_text)
-                
-        #         # Printing captured Captch
-        #         print("Captcha Text : ",captcha_text)
-
-        #     driver.find_element(By.NAME, "submit1").click()
-
-        #     # Wait for results to load
-        #     time.sleep(5)
-
-        #     # Getting the status of the submission
-        #     submit_status = driver.find_element(By.ID,"txtmsg").get_attribute("title")
-        #     print("Submit Status :",submit_status)
-        #     print("Submit Status :",type(submit_status))
-
-        #     if submit_status is None or submit_status.strip() == "" or "Invalid" not in submit_status:
-        #         print("captcha Solved Successfully!")
-        #         break
-        #     else:
-        #         print(f"Got Invalid Captcha Atempt : {attempt+1}")
-        #         submit_status = ""
-
+        # Trying to solve captch multiple time incase they are not solved for the first time
         max_attempts = 5
         captcha_solved = False
         for attempt in range(max_attempts):
             # Screenshot captcha
             captcha_image = driver.find_element(By.ID, "captcha_image")
-            captcha_image.screenshot("static/captcha.jpg")
+            captcha_image.screenshot("static/captcha.png")
 
             captcha_input_box = driver.find_element(By.ID, "captcha")
-            captcha_text = await solve_captcha("static/captcha.jpg")
+            captcha_text = await solve_captcha("static/captcha.png")
             captcha_input_box.clear()
             captcha_input_box.send_keys(captcha_text)
 
@@ -124,22 +89,53 @@ async def submit_case_details(url, case_type, case_number, year):
                 # Getting the Inner HTML from the page
                 case_page = driver.find_element(By.ID,"secondpage").get_attribute("innerHTML")
 
+                # We Need to download the PDFs at the time of the scrapping itself otherwise they are not downloadable due to the session restictions.
+                
+                # Getting all PDF links
+                pdf_links = driver.find_elements(By.XPATH,"//a[contains(@href, 'display_pdf.php')]")
+                
+                print("\n\n")
+                if not os.path.exists("static/pdf"):
+                    os.makedirs("static/pdf")
+
+                # Extract Selenium cookies for requests
+                cookies = {c['name']: c['value'] for c in driver.get_cookies()}
+                headers = {
+                    "User-Agent": "Mozilla/5.0",
+                    "Referer": driver.current_url
+                }
+
+                for idx, link in enumerate(pdf_links, start=1):
+                    pdf_url = link.get_attribute("href")
+                    if not pdf_url:
+                        continue
+                    print(f"Downloading PDF {idx}: {pdf_url}")
+                    r = requests.get(pdf_url, headers=headers, cookies=cookies)
+                    if r.status_code == 200 and "application/pdf" in r.headers.get("Content-Type", ""):
+                        file_path = f"static/pdf/order_{idx}.pdf"
+                        with open(file_path, "wb") as f:
+                            f.write(r.content)
+                        print(f"Saved: {file_path}")
+                    else:
+                        print(f"Failed to download PDF {idx}. Status: {r.status_code}")
+
                 # Saving This Details Page For further processing
                 if not os.path.exists("scrapped_page"):
                     os.mkdir("scrapped_page")
-
 
                 with open("scrapped_page/case_details.html","w") as file:
                     file.write(case_page)
 
                 print("CAPTCHA solved and result page loaded!")
                 captcha_solved = True
-                break
+                return "Success"
             except:
                 # Try to get any error message
                 try:
                     submit_status = driver.find_element(By.ID, "txtmsg").get_attribute("title")
                     print("Submit Status:", submit_status)
+                    if submit_status =="Record Not Found":
+                        return "Invalid"
                 except:
                     submit_status = None
 
@@ -147,11 +143,11 @@ async def submit_case_details(url, case_type, case_number, year):
 
         # If captch is not solved 
         if not captcha_solved:
-            print("There was problem while solving the captcha sorry for inconvience")
+            return "Failed"
     except Exception as e:
         print("Error : ",e)
     finally:
-        # driver.quit()
+        driver.quit()
         print("Driver Session Closed")
 
 

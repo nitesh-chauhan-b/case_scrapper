@@ -1,5 +1,5 @@
 import pytesseract
-from PIL import Image
+from PIL import Image, ImageOps, ImageFilter
 import asyncio
 
 
@@ -9,11 +9,17 @@ async def solve_captcha(image_path):
     # Convert to grayscale and apply thresholding
     img = Image.open(image_path).convert("L")
     
-    # Apply a binary threshold to the image
-    img = img.point(lambda x: 0 if x < 140 else 255, '1')
+    # Increasing Image Contrast
+    # img = ImageOps.autocontrast(img)
+
+    # Applying a binary threshold to the image
+    img = img.point(lambda x: 0 if x < 150 else 255, '1')
+
+    # Sharpning Image For Better Accuracy
+    # img = img.filter(ImageFilter.SHARPEN)
 
     # Resize the image to improve OCR accuracy
-    img = img.resize((img.width * 2, img.height * 2))
+    img = img.resize((img.width * 2, img.height * 2),Image.LANCZOS)
 
     # Set the path to the tesseract executable
     pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
@@ -30,7 +36,7 @@ async def solve_captcha(image_path):
     
 
 if __name__ == "__main__":
-    image_path = "static\image.png"  # Path to the captcha image
+    image_path = "static\captcha.png"  # Path to the captcha image
     solved_text = asyncio.run(solve_captcha(image_path))
     print(f"Solved Captcha: {solved_text}")
 

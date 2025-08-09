@@ -23,6 +23,13 @@ URL ="https://hcservices.ecourts.gov.in/ecourtindiaHC/cases/case_no.php?state_cd
 
 @app.get("/", response_class=HTMLResponse)
 async def index(request: Request):
+    # Removing Old Orders PDF if they exits
+    folder = "static/pdf"
+    if os.path.exists(folder):
+        for file in os.listdir(folder):
+            file_path = os.path.join(folder, file)
+            if os.path.isfile(file_path):  # Make sure it's a file, not a folder
+                os.remove(file_path)
     return templates.TemplateResponse("Form.html",{"request":request})
 
 
@@ -33,12 +40,19 @@ async def search_case(request: Request, case_type: str = Form(...), case_number:
 
     # Passing this data to the scrapper
     # this will get the details and save it in html file for further processing
-    await submit_case_details(URL,case_type, case_number, year)
-
-    # Getting Details
-    result = await get_case_details()
-    return templates.TemplateResponse("result.html", {"request": request, "result": result})
-
+    response_message = await submit_case_details(URL,case_type, case_number, year)
+    if response_message=="Success":
+        # Getting Details
+        result = await get_case_details()
+        return templates.TemplateResponse("result.html", {"request": request, "result": result})
+    
+    elif response_message=="Invalid":
+        # Respose for invalid details
+        return templates.TemplateResponse("invalid_details.html",{"request":request})
+    
+    else:
+        # Show error page when response is False
+        return templates.TemplateResponse("error.html", {"request": request})
 
 
 if __name__ == "__main__":
