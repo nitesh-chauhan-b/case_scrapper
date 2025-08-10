@@ -4,11 +4,10 @@ from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 
-
 import time
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from captch_reader import solve_captcha
+from captcha_reader import solve_captcha
 import requests
 import os
 import asyncio
@@ -24,7 +23,7 @@ def create_driver():
     options.add_argument("--disable-software-rasterizer")
 
     
-    # Initialize the Chrome driver
+    # Initialize the Chrome # driver
     driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)
     
     return driver

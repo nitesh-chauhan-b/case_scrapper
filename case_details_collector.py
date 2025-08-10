@@ -114,79 +114,85 @@ async def get_case_details():
             data["respondent_names"] = respondents
 
 
-            # print(data)
+            print(data)
 
 
             # Getting acts 
+            try:
+                # If table Doen't Exists
+                data["acts"] = ["N/A"]
+                data["sections"] = ["N/A"]
+    
+                act_table = soup.find("table",id="act_table")
 
-            act_table = soup.find("table",id="act_table")
+                # Geting all the rows (excluding the header)
+                rows = act_table.find_all('tr')[1:]  # skip the header row
 
-            # Geting all the rows (excluding the header)
-            rows = act_table.find_all('tr')[1:]  # skip the header row
+                # For Storing the data
+                acts = []
+                sections = []
+                # Extracting acts and sections
+                for row in rows:
+                    cols = row.find_all('td')
+                    act = cols[0].get_text(strip=True)
+                    section = cols[1].get_text(strip=True)
+                    # print("Act:", act)
+                    # print("Section:", section)
 
-            # For Storing the data
-            acts = []
-            sections = []
-            # Extracting acts and sections
-            for row in rows:
-                cols = row.find_all('td')
-                act = cols[0].get_text(strip=True)
-                section = cols[1].get_text(strip=True)
-                # print("Act:", act)
-                # print("Section:", section)
+                    acts.append(act)
+                    sections.append(section)
 
-                acts.append(act)
-                sections.append(section)
-
-            
-            # Adding data
-            data["acts"] = acts
-            data["sections"] = sections
-
-
-
-            # Getting orders details
-            order_table = soup.find("table",class_="order_table")
-            orders = order_table.find_all("tr")[1:]
-
-            # For Storing details
-            judges = []
-            order_dates = []
-            # Getting all the order and thier order pdf
-            for order in orders:
-                cols = order.find_all("td")
                 
-                # Extract Judge, Order Date, and Order Details
-                judge = cols[2].get_text(strip=True)
-                order_date = cols[3].get_text(strip=True)
-                # order_link_tag = cols[4].find("a")
-                # order_link = order_link_tag['href'] if order_link_tag else None
+                # Adding data
+                data["acts"] = acts
+                data["sections"] = sections
 
-                judges.append(judge)
-                order_dates.append(order_date)
-                # order_pdf_link.append(website_prefix)
-            
-            # Getting Stored PDF links
-            order_pdf_link = []
-            if os.path.exists("static/pdf"):
-                files = os.listdir("static/pdf")
+            except Exception as e:
+                print("Act Table Scrapping Error : ",e)
+            try:
+                # Getting orders details
+                order_table = soup.find("table",class_="order_table")
+                orders = order_table.find_all("tr")[1:]
 
-                # Making files sorted for orders 
-                files.sort(key=lambda x: int(x.replace("order_", "").replace(".pdf", "")))
+                # For Storing details
+                judges = []
+                order_dates = []
+                # Getting all the order and thier order pdf
+                for order in orders:
+                    cols = order.find_all("td")
+                    
+                    # Extract Judge, Order Date, and Order Details
+                    judge = cols[2].get_text(strip=True)
+                    order_date = cols[3].get_text(strip=True)
+                    # order_link_tag = cols[4].find("a")
+                    # order_link = order_link_tag['href'] if order_link_tag else None
 
-                for file in files:
-                    order_pdf_link.append("./static/pdf/"+file)
+                    judges.append(judge)
+                    order_dates.append(order_date)
+                    # order_pdf_link.append(website_prefix)
+                
+                # Getting Stored PDF links
+                order_pdf_link = []
+                if os.path.exists("static/pdf"):
+                    files = os.listdir("static/pdf")
+
+                    # Making files sorted for orders 
+                    files.sort(key=lambda x: int(x.replace("order_", "").replace(".pdf", "")))
+
+                    for file in files:
+                        order_pdf_link.append("./static/pdf/"+file)
 
 
-            # Adding orders details
-            data["judges"] = judges
-            data["order_dates"] = order_dates
-            data["order_links"] = order_pdf_link
-
-            print(data["order_links"])
+                # Adding orders details
+                data["judges"] = judges
+                data["order_dates"] = order_dates
+                data["order_links"] = order_pdf_link
+            except Exception as e:
+                print("Orders Table Scrapping Error :",e)
+            print(data)
         return data
     except Exception as e:
-        print(e)
+        print("Scrapping Error : ",e)
 
 
 if __name__ =="__main__":

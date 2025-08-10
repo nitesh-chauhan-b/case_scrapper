@@ -73,6 +73,9 @@
     .button:hover {
       background-color: #0056b3;
     }
+    .container{
+      max-width: 1000px;
+    }
   </style>
 </head>
 
@@ -186,6 +189,7 @@
       <table class="orders-table">
         <thead>
           <tr>
+            <th>No</th>
             <th>Date</th>
             <th>Judge(s)</th>
             <th>Action</th>
@@ -194,6 +198,7 @@
         <tbody>
           {% for i in range(result.order_dates|length) %}
           <tr>
+            <td>{{i+1}}</td>
             <td>{{ result.order_dates[i] }}</td>
             <td>{{ result.judges[i] }}</td>
             <td>
