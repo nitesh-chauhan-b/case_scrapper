@@ -55,9 +55,9 @@ python app.py
 
 Below are screenshots of the Calcutta High Court Case Information System web interface:
 
-![Case Search Form](static\SS\1.png)
+![Case Search Form](./static/SS/1.png)
 
-![Case Search Result](static\SS\2.png)
+![Case Search Result](./static/SS/2.png)
 
 Watch a demo of the project in action: [Video](https://youtu.be/ELNV73IvnNk)
 
