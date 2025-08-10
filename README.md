@@ -51,6 +51,18 @@ python app.py
 
 ---
 
+# Screenshots
+
+Below are screenshots of the Calcutta High Court Case Information System web interface:
+
+![Case Search Form](./static/SS/1.png)
+
+![Case Search Result](./static/SS/2.png)
+
+Watch a demo of the project in action: [Video](https://youtu.be/ELNV73IvnNk)
+
+
+
 **Note:**
 - Ensure Tesseract is installed and the path is correctly set in `captcha_reader.py`.
 - For any issues, refer to the official documentation of [Tesseract OCR](https://github.com/tesseract-ocr/tesseract) and [FastAPI](https://fastapi.tiangolo.com/).
